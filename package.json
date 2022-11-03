@@ -1,9 +1,9 @@
 {
+  "type":"module",
   "name": "awilayah",
   "version": "1.0.0",
   "description": "REST API Wilayah Di Indonesia, Provinsi, Kabupaten/Kota, Kecamatan, Kelurahan (NodeJs ExpressJs)",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
