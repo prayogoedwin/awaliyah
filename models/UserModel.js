@@ -22,7 +22,6 @@ const Users = db.define('tbl_users', {
     unique: true,
     required: true,
     validate: {
-      notNull: new Error('Tidak Boleh Kosong!'),
       isUnique: (value, next) => {
         Users.findAll({
           where: { email: value },
@@ -30,10 +29,11 @@ const Users = db.define('tbl_users', {
         })
           .then((user) => {
             if (user.length != 0)
-              next(new Error('Email sudah digunakan!'));
+              next(new Error('EMAIL_ALREADY_REGISTERED'));
             next();
           })
-          .catch((onError) => console.log(onError));
+          // .catch((onError) => console.log(onError));
+          .catch((onError) => console.log('error'));
       },
     },
   },
