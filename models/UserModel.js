@@ -21,21 +21,9 @@ const Users = db.define('tbl_users', {
     allowNull: false,
     unique: true,
     required: true,
-    validate: {
-      isUnique: (value, next) => {
-        Users.findAll({
-          where: { email: value },
-          attributes: ['id'],
-        })
-          .then((user) => {
-            if (user.length != 0)
-              next(new Error('EMAIL_ALREADY_REGISTERED'));
-            next();
-          })
-          // .catch((onError) => console.log(onError));
-          .catch((onError) => console.log('error'));
-      },
-    },
+  },
+  fullname: {
+    type: DataTypes.STRING
   },
   password: {
     type: DataTypes.STRING

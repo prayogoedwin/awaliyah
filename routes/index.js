@@ -3,7 +3,8 @@ import express from "express";
 import cors from "cors";
 
 import { 
-    UserRegister
+    UserRegister,
+    UserLogin
  } from "../controllers/AuthController.js";
 
  // Init express router
@@ -13,5 +14,6 @@ import {
 
 
  router.post('/api/register', UserRegister);
+ router.post('/api/login', UserLogin);
 
  export default router;
