@@ -100,12 +100,11 @@ export const UserLogin = async (req, res) => {
     }
 }
 
-
 //Login User
 export const RefreshToken = async (req, res) => {
     try {
 
-        if(!req.body.refreshToken){ throw  {code: 412, message: 'REFREH_TOKEN_IS_REQUIRED'} }
+        if(!req.body.refreshToken){ throw  {code: 412, message: 'REFRESH_TOKEN_IS_REQUIRED'} }
         
         const verify = await jwt.verify(req.body.refreshToken, process.env.REFRESH_TOKEN_SECRET)
         let payload = {id : verify.id}
@@ -115,7 +114,7 @@ export const RefreshToken = async (req, res) => {
 
         res.status(200).json({
             'status' : true,
-            'message': 'REFREH_TOKEN_SUCCESS',
+            'message': 'REFRESH_TOKEN_SUCCESS',
             accessToken,
             refreshToken
         });
@@ -130,7 +129,7 @@ export const RefreshToken = async (req, res) => {
         ]
         if(err.message == 'jwt expired'){
 
-            err.message = 'REFREH_TOKEN_EXPIRED'
+            err.message = 'REFRESH_TOKEN_EXPIRED'
 
         }else if(errorJwt.includes(err.message)){
             err.message = 'INVALID_REFRESH_TOKEN'

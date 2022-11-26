@@ -2,6 +2,8 @@
 import express from "express";
 import cors from "cors";
 
+import jwtAuth from "../middlewares/JwtAuth.js";
+
 import { 
     UserRegister,
     UserLogin,
@@ -16,6 +18,6 @@ import {
 
  router.post('/api/register', UserRegister);
  router.post('/api/login', UserLogin);
- router.post('/api/refreshtoken', RefreshToken);
+ router.post('/api/refreshtoken', jwtAuth() ,RefreshToken);
 
  export default router;
