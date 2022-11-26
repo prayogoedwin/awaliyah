@@ -4,7 +4,8 @@ import cors from "cors";
 
 import { 
     UserRegister,
-    UserLogin
+    UserLogin,
+    RefreshToken
  } from "../controllers/AuthController.js";
 
  // Init express router
@@ -15,5 +16,6 @@ import {
 
  router.post('/api/register', UserRegister);
  router.post('/api/login', UserLogin);
+ router.post('/api/refreshtoken', RefreshToken);
 
  export default router;

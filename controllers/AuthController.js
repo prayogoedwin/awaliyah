@@ -2,6 +2,15 @@
 import Users from "../models/UserModel.js";
 import emailExist from "../libraries/emailExist.js";  
 import bcrypt from "bcrypt";
+import jwt  from "jsonwebtoken";
+
+const generateAccessToken = async (payload) => {
+    return jwt.sign({payload}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME});
+}
+
+const generateRefreshToken = async (payload) => {
+    return jwt.sign({payload}, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION_TIME});
+}
 
 // Regiter
 export const UserRegister = async (req, res) => {
@@ -58,26 +67,74 @@ export const UserLogin = async (req, res) => {
         });
         if(!user){ throw  {code: 405, message: 'USER_NOT_FOUND'} }
 
+        const accessToken = await generateAccessToken({id : user.id})
+        const refreshToken = await generateRefreshToken({id : user.id})
+
         const passwordHash = user.password;
         const verified = bcrypt.compareSync(req.body.password, passwordHash);
         if(!verified){ throw  {code: 401, message: 'UNAUTHORIZED'} }
 
-        let id_token = bcrypt.hashSync(req.body.email+datetime, 10);
-        const update = await Users.update({token: id_token},{where:{id: user.id}});
+        // let id_token = bcrypt.hashSync(req.body.email+datetime, 10);
+        // const update = await Users.update({token: id_token},{where:{id: user.id}});
         var dt = {
             // id : user.id,
             email  : user.email,
             role : user.role_id,
             fullname : user.fullname,
-            id_token : id_token
+            // id_token : id_token
         }
         res.status(200).json({
             'status' : true,
-            'message': 'LOGGED_IN',
-            'data' : dt
+            'message': 'LOGIN_SUCCESS',
+            'data' : dt,
+            accessToken,
+            refreshToken
         });
         
     } catch (err) {
+        res.status(err.code || 500).json({
+            'status' : false,
+            'message': err.message,
+            // 'message': 'Error'
+        });
+    }
+}
+
+
+//Login User
+export const RefreshToken = async (req, res) => {
+    try {
+
+        if(!req.body.refreshToken){ throw  {code: 412, message: 'REFREH_TOKEN_IS_REQUIRED'} }
+        
+        const verify = await jwt.verify(req.body.refreshToken, process.env.REFRESH_TOKEN_SECRET)
+        let payload = {id : verify.id}
+
+        const accessToken = await generateAccessToken(payload)
+        const refreshToken = await generateRefreshToken(payload)
+
+        res.status(200).json({
+            'status' : true,
+            'message': 'REFREH_TOKEN_SUCCESS',
+            accessToken,
+            refreshToken
+        });
+        
+    } catch (err) {
+
+        const errorJwt = [
+            'invalid signature',
+            'invalid token',
+            'jwt malformed',
+            'jwt must be provided'
+        ]
+        if(err.message == 'jwt expired'){
+
+            err.message = 'REFREH_TOKEN_EXPIRED'
+
+        }else if(errorJwt.includes(err.message)){
+            err.message = 'INVALID_REFRESH_TOKEN'
+        }
         res.status(err.code || 500).json({
             'status' : false,
             'message': err.message,
